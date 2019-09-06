@@ -260,7 +260,7 @@ int main(int argc, char** argv) {
 				error=sqlite3_prepare_v2(conn, s.c_str(),1000,&res,&tail);
 				while(sqlite3_step(res) == SQLITE_ROW){
 					actual=atoi(reinterpret_cast<const char *>(sqlite3_column_text(res,0)));
-					cout<<"Salrio actual: "<<actual;
+					cout<<"Salrio actual: "<<actual<<endl;
 				}
 				s="select emp.sal from emp where mgr='"+empno+"'";
 				error=sqlite3_prepare_v2(conn, s.c_str(),1000,&res,&tail);
