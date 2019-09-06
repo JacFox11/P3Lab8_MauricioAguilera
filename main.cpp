@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <bits/stdc++.h>
 #include <stdlib.h>
 #include <sqlite3.h>
 
@@ -15,12 +17,13 @@ int main(int argc, char** argv) {
 	string base="oracle-sample.db";
 	
 	char op='0';
-	while (op!='5'){
+	while (op!='7'){
 		system("cls");
 		cout<<"...:::MENU PRINCIPAL:::..."<<endl;
 		cout<<"1. Listar departamentos y empleados"<<endl<<
 		"2. Agregar departamento/empleado"<<endl<<
-		"4. Eliminar empleado"<<endl<<
+		"3. Eliminar empleado"<<endl<<
+		"4. Listar Jefe con sus empleados respectivos"<<endl<<
 		"5. Actualizar salario de empleado"<<endl<<
 		"6. Listar departamento y su respectivo departamento"<<endl<<
 		"7. Salir"<<endl<<
@@ -44,7 +47,7 @@ int main(int argc, char** argv) {
 							error=sqlite3_prepare_v2(conn, "select * from dept",1000,&res,&tail);
 							cout<<"DEPARTAMENTOS"<<endl<<endl;
 							while(sqlite3_step(res) == SQLITE_ROW){
-								cout<<"Deptno: "<<sqlite3_column_text(res,0)<<endl<<"Dname: "<<sqlite3_column_text(res,1)<<endl<<"Loc: "<<sqlite3_column_text(res,2)<<endl<<endl;
+								cout<<setw(8)<<"Deptno: "<<sqlite3_column_text(res,0)<<endl<<setw(8)<<"Dname: "<<sqlite3_column_text(res,1)<<endl<<setw(8)<<"Loc: "<<sqlite3_column_text(res,2)<<endl<<endl;
 							}
 							if (error!= SQLITE_OK){
 								system("cls");
@@ -60,7 +63,7 @@ int main(int argc, char** argv) {
 							error=sqlite3_prepare_v2(conn, "select * from emp",1000,&res,&tail);
 							cout<<"EMPLEADOS"<<endl<<endl;
 							while(sqlite3_step(res) == SQLITE_ROW){
-								cout<<"Empno: "<<sqlite3_column_text(res,0)<<endl<<"Ename: "<<sqlite3_column_text(res,1)<<endl<<"Job: "<<sqlite3_column_text(res,2)<<endl<<"Mgr: "<<sqlite3_column_text(res,3)<<endl<<"Hiredate: "<<sqlite3_column_text(res,4)<<endl<<"Sal: "<<sqlite3_column_text(res,5)<<endl<<"Comm: "<<sqlite3_column_text(res,6)<<endl<<"Deptno: "<<sqlite3_column_text(res,7)<<endl<<endl;
+								cout<<setw(10)<<"Empno: "<<sqlite3_column_text(res,0)<<endl<<setw(10)<<"Ename: "<<sqlite3_column_text(res,1)<<endl<<setw(10)<<"Job: "<<sqlite3_column_text(res,2)<<endl<<setw(10)<<"Mgr: "<<sqlite3_column_text(res,3)<<endl<<setw(10)<<"Hiredate: "<<sqlite3_column_text(res,4)<<endl<<setw(10)<<"Sal: "<<sqlite3_column_text(res,5)<<endl<<setw(10)<<"Comm: "<<sqlite3_column_text(res,6)<<endl<<setw(10)<<"Deptno: "<<sqlite3_column_text(res,7)<<endl<<endl;
 							}
 							if (error!= SQLITE_OK){
 								system("cls");
@@ -106,7 +109,6 @@ int main(int argc, char** argv) {
 							getline(cin, name);
 							cout<<"Loc: ";
 							getline(cin, loc);
-							getline(cin, loc);
 							error=sqlite3_open(base.c_str(),&conn);
 							cout<<"Hola"<<endl;
 							string s="insert into dept values('"+deptno+"','"+name+"','"+loc+"')";
@@ -133,21 +135,15 @@ int main(int argc, char** argv) {
 							getline(cin, name);
 							cout<<"Job: ";
 							getline(cin, job);
-							getline(cin, job);
-							cout<<"Mgr "<<endl;
-							getline(cin, mgr);
+							cout<<"Mgr: ";
 							getline(cin, mgr);
 							cout<<"Hiredate (YYYY-MM-DD): ";
 							getline(cin, hiredate);
-							getline(cin, hiredate);
 							cout<<"Sal: ";
-							getline(cin, sal);
 							getline(cin, sal);
 							cout<<"Comm: ";
 							getline(cin, comm);
-							getline(cin, comm);
 							cout<<"Deptno: ";
-							getline(cin, deptno);
 							getline(cin, deptno);
 							error=sqlite3_open(base.c_str(),&conn);
 							string s="insert into emp values('"+empno+"','"+name+"','"+job+"','"+mgr+"','"+hiredate+"','"+sal+"','"+comm+"','"+deptno+"')";
@@ -175,21 +171,23 @@ int main(int argc, char** argv) {
 						}
 					}
 				}
-				/*string c, n, p;
-				cout<<"Cuenta: ";
-				cin>>c;
-				cout<<"Nombre: ";
-				cin>>n;
-				cout<<"Profesion: ";
-				cin>>p;
-				string s="insert into alumnos values('"+c+"','"+n+"','"+p+"')";
-				error=sqlite3_open("base1.db",&conn);
-				error=sqlite3_exec(conn,s.c_str()
-				,0,0,0);
-				sqlite3_close(conn);*/
 				break;
 			}
 			case '3':{
+				system("cls");
+				error=sqlite3_open(base.c_str(),&conn);
+				cout<<"...:::ELIMINAR EMPLEADO:::..."<<endl;
+				error=sqlite3_prepare_v2(conn, "select emp.empno,emp.ename from emp",1000,&res,&tail);
+				while(sqlite3_step(res) == SQLITE_ROW){
+					cout<<sqlite3_column_text(res,0)<<", "<<sqlite3_column_text(res,1)<<endl;
+				}
+				cout<<endl;
+				string empno;
+				cout<<"Empno del empleado a eliminar: ";
+				cin>>empno;
+				string s="delete from emp where empno='"+empno+"'";
+				error=sqlite3_exec(conn,s.c_str(),0,0,0);
+				sqlite3_close(conn);
 				/*string cuenta;
 				cout<<"Ingrese la cuenta de persona a modificar: ";
 				cin>>cuenta;
@@ -208,14 +206,125 @@ int main(int argc, char** argv) {
 				break;
 			}
 			case '4':{
-				/*error=sqlite3_open("base1.db",&conn);
-				error=sqlite3_exec(conn,
-				"delete from alumnos where cuanta='200'"
-				,0,0,0);
-				sqlite3_close(conn);*/
+				system("cls");
+				error=sqlite3_open(base.c_str(),&conn);
+				cout<<"...:::LISTAR JEFE:::..."<<endl;
+				error=sqlite3_prepare_v2(conn, "select emp.empno,emp.ename from emp",1000,&res,&tail);
+				while(sqlite3_step(res) == SQLITE_ROW){
+					cout<<sqlite3_column_text(res,0)<<", "<<sqlite3_column_text(res,1)<<endl;
+				}
+				cout<<endl;
+				string empno;
+				cout<<"Empno del empleado a listar: ";
+				cin>>empno;
+				system("cls");
+				string s="select * from emp where empno='"+empno+"'";
+				error=sqlite3_prepare_v2(conn, s.c_str(),1000,&res,&tail);
+				cout<<"JEFE:"<<endl<<endl;
+				while(sqlite3_step(res) == SQLITE_ROW){
+					cout<<setw(10)<<"Empno: "<<sqlite3_column_text(res,0)<<endl<<setw(10)<<"Ename: "<<sqlite3_column_text(res,1)<<endl<<setw(10)<<"Job: "<<sqlite3_column_text(res,2)<<endl<<setw(10)<<"Mgr: "<<sqlite3_column_text(res,3)<<endl<<setw(10)<<"Hiredate: "<<sqlite3_column_text(res,4)<<endl<<setw(10)<<"Sal: "<<sqlite3_column_text(res,5)<<endl<<setw(10)<<"Comm: "<<sqlite3_column_text(res,6)<<endl<<setw(10)<<"Deptno: "<<sqlite3_column_text(res,7)<<endl<<endl;
+				}
+				cout<<endl;
+				s="select * from emp where mgr='"+empno+"'";
+				error=sqlite3_prepare_v2(conn, s.c_str(),1000,&res,&tail);
+				cout<<"EMPLEADOS:"<<endl<<endl;
+				while(sqlite3_step(res) == SQLITE_ROW){
+					cout<<setw(10)<<"Empno: "<<sqlite3_column_text(res,0)<<endl<<setw(10)<<"Ename: "<<sqlite3_column_text(res,1)<<endl<<setw(10)<<"Job: "<<sqlite3_column_text(res,2)<<endl<<setw(10)<<"Mgr: "<<sqlite3_column_text(res,3)<<endl<<setw(10)<<"Hiredate: "<<sqlite3_column_text(res,4)<<endl<<setw(10)<<"Sal: "<<sqlite3_column_text(res,5)<<endl<<setw(10)<<"Comm: "<<sqlite3_column_text(res,6)<<endl<<setw(10)<<"Deptno: "<<sqlite3_column_text(res,7)<<endl<<endl;
+				}
+				if (error!= SQLITE_OK){
+					system("cls");
+					cout<<"Ocurrio un error al listar los empleados"<<endl;
+					system("pause");
+				}
+				sqlite3_close(conn);
+				system("pause");
 				break;
 			}
 			case '5':{
+				system("cls");
+				int actual;
+				int c=0;
+				int nuevo=0;
+				error=sqlite3_open(base.c_str(),&conn);
+				cout<<"...:::ACTUALIZAR JEFE:::..."<<endl;
+				error=sqlite3_prepare_v2(conn, "select emp.empno,emp.ename from emp",1000,&res,&tail);
+				while(sqlite3_step(res) == SQLITE_ROW){
+					cout<<sqlite3_column_text(res,0)<<", "<<sqlite3_column_text(res,1)<<endl;
+				}
+				cout<<endl;
+				string empno;
+				cout<<"Empno del empleado a actualizar: ";
+				cin>>empno;
+				system("cls");
+				string s="select emp.sal from emp where empno='"+empno+"'";
+				error=sqlite3_prepare_v2(conn, s.c_str(),1000,&res,&tail);
+				while(sqlite3_step(res) == SQLITE_ROW){
+					actual=atoi(reinterpret_cast<const char *>(sqlite3_column_text(res,0)));
+					cout<<"Salrio actual: "<<actual<<endl;
+				}
+				s="select emp.sal from emp where mgr='"+empno+"'";
+				error=sqlite3_prepare_v2(conn, s.c_str(),1000,&res,&tail);
+				while(sqlite3_step(res) == SQLITE_ROW){
+					nuevo=nuevo+atoi(reinterpret_cast<const char *>(sqlite3_column_text(res,0)));
+					c++;
+				}
+				if (c==0){
+					nuevo=actual;
+				}else{
+					nuevo=(nuevo/c)*2;
+				}
+				stringstream ss;
+				ss << nuevo;
+				string temp = ss.str();
+				cout<<"Salario nuevo: "<<temp<<endl;
+				s="update emp set sal='"+temp+"' where empno='"+empno+"'";
+				error=sqlite3_exec(conn, s.c_str(),0,0,0);
+				if (error!= SQLITE_OK){
+					system("cls");
+					cout<<"Ocurrio un error al listar los empleados"<<endl;
+				}
+				cout<<"Salario actualizado"<<endl;
+				sqlite3_close(conn);
+				system("pause");
+				break;
+			}
+			case '6':{
+				system("cls");
+				error=sqlite3_open(base.c_str(),&conn);
+				cout<<"...:::LISTAR EMPLEADOS DE DEPARTAMENTO:::..."<<endl;
+				error=sqlite3_prepare_v2(conn, "select dept.deptno,dept.dname from dept",1000,&res,&tail);
+				while(sqlite3_step(res) == SQLITE_ROW){
+					cout<<sqlite3_column_text(res,0)<<", "<<sqlite3_column_text(res,1)<<endl;
+				}
+				cout<<endl;
+				string deptno;
+				cout<<"Deptno del departamento a listar: ";
+				cin>>deptno;
+				system("cls");
+				string s="select * from dept where deptno='"+deptno+"'";
+				error=sqlite3_prepare_v2(conn, s.c_str(),1000,&res,&tail);
+				cout<<"DEPRATAMENTO:"<<endl<<endl;
+				while(sqlite3_step(res) == SQLITE_ROW){
+					cout<<setw(8)<<"Deptno: "<<sqlite3_column_text(res,0)<<endl<<setw(8)<<"Dname: "<<sqlite3_column_text(res,1)<<endl<<setw(8)<<"Loc: "<<sqlite3_column_text(res,2)<<endl<<endl;
+				}
+				cout<<endl;
+				s="select * from emp where deptno='"+deptno+"'";
+				error=sqlite3_prepare_v2(conn, s.c_str(),1000,&res,&tail);
+				cout<<"EMPLEADOS:"<<endl<<endl;
+				while(sqlite3_step(res) == SQLITE_ROW){
+					cout<<setw(10)<<"Empno: "<<sqlite3_column_text(res,0)<<endl<<setw(10)<<"Ename: "<<sqlite3_column_text(res,1)<<endl<<setw(10)<<"Job: "<<sqlite3_column_text(res,2)<<endl<<setw(10)<<"Mgr: "<<sqlite3_column_text(res,3)<<endl<<setw(10)<<"Hiredate: "<<sqlite3_column_text(res,4)<<endl<<setw(10)<<"Sal: "<<sqlite3_column_text(res,5)<<endl<<setw(10)<<"Comm: "<<sqlite3_column_text(res,6)<<endl<<setw(10)<<"Deptno: "<<sqlite3_column_text(res,7)<<endl<<endl;
+				}
+				if (error!= SQLITE_OK){
+					system("cls");
+					cout<<"Ocurrio un error al listar los empleados"<<endl;
+					system("pause");
+				}
+				sqlite3_close(conn);
+				system("pause");
+				break;
+			}
+			case '7':{
+				
 				break;
 			}
 			default:{
